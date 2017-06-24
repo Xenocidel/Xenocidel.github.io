@@ -9,5 +9,3 @@ if($token == "multicaster_verif_token"){
 	echo $challenge;
 }
 
-
-?>
