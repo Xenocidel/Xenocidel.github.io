@@ -14,5 +14,20 @@
 	<a href="https://www.linkedin.com/in/aaron-liao-09377277/">LinkedIn</a>
 	<a href="mailto:aliao4@uci.edu">Email</a>
 </h2>
+
+<?php 
+
+if(isset($_REQUEST['hub_challenge')){
+	$challenge = $_REQUEST['hub_challenge'];
+	$token = $_REQUEST['hub_verify_token'];
+}
+
+if($token == "multicaster_verif_token"){
+	echo $challenge;
+}
+
+
+?>
+
 </body>
 </html>
