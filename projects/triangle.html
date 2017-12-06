@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Term Project</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <style>
+    canvas{
+        top: 10px;
+    }
+    .onesoln td:nth-child(4),
+        .onesoln th:nth-child(4) span {
+            display: none;
+    }
+    #backtowebsite{
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        cursor: pointer;
+    }
+    </style>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    <!-- <script src="js/bootstrap.min.js"></script> -->
+    
+    <!-- JavaScript -->
+    <script>
+    "use strict";
+    
+    $(document).ready(function() {
+        var offset = 100;
+        var offset2 = 360;
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > offset) {
+                $('#backdiv').hide();
+            } else {
+                $('#backdiv').show();
+            }
+            if ($(this).scrollTop() > offset2){
+                $('canvas').css({'position': 'fixed'});
+            }
+            else{
+                $('canvas').css({'position': 'absolute'});
+            }
+        });
+    });
+    
+    function loadExample(num){
+        document.getElementById("form_a").reset();
+        document.getElementById("form_b").reset();
+        document.getElementById("form_c").reset();
+        clearOutputs(1);
+        clearOutputs(2);
+        clearOutputs(3);
+        switch (num){
+            case 0:
+                document.getElementById("sideAin").value = 200;
+                document.getElementById("sideCin").value = 200;
+                document.getElementById("angleBin").value = 120;
+                document.getElementById("sideBin_b").value = 220;
+                document.getElementById("sideCin_b").value = 70;
+                document.getElementById("angleCin_b").value = 15;
+                document.getElementById("sideDin").value = 45;
+                document.getElementById("angleDin").value = 50;
+                break;
+            case 1:
+                document.getElementById("sideAin").value = 210;
+                document.getElementById("sideBin").value = 200;
+                document.getElementById("angleBin").value = 70;
+                document.getElementById("sideBin_b").value = 200;
+                document.getElementById("sideCin_b").value = 180;
+                document.getElementById("angleCin_b").value = 59;
+                document.getElementById("sideEin").value = 0;
+                document.getElementById("angleEin").value = 180;
+        }
+        solve(1);
+        solve(2);
+        solve(3);
+    }
+    
+    function toggleText(button_id){
+        var e1 = document.getElementById(button_id)
+        if (e1.firstChild.data == "Show"){
+            e1.firstChild.data = "Hide";
+        }
+        else{
+            e1.firstChild.data = "Show";
+        }
+    }
+    
+    function draw() {
+
+      var canvas = document.getElementById('canvas');
+      if (canvas.getContext) {
+        var ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (document.getElementById("status_c").innerHTML != "All green!")
+            return false;
+        var anchorx = 100;
+        var startx = anchorx;
+        var anchory = 300;
+        var starty = anchory;
+        var x1;
+        var y1;
+        var x2;
+        var y2;
+        var asidea  = parseFloat(document.getElementById("sideAout").innerHTML);
+        var asidec  = parseFloat(document.getElementById("sideCout").innerHTML);
+        var aangleb = parseFloat(document.getElementById("angleBout").innerHTML);
+        var aanglec = parseFloat(document.getElementById("angleCout").innerHTML);
+        var bsideb  = parseFloat(document.getElementById("sideBout_b").innerHTML);
+        var bsidec  = parseFloat(document.getElementById("sideCout_b").innerHTML);
+        var banglea = parseFloat(document.getElementById("angleAout_b").innerHTML);
+        var sided   = parseFloat(document.getElementById("sideDout").innerHTML);
+        var sidee   = parseFloat(document.getElementById("sideEout").innerHTML);
+        var angled  = parseFloat(document.getElementById("angleDout").innerHTML);
+        var anglee  = parseFloat(document.getElementById("angleEout").innerHTML);
+        
+        var asidea2 = parseFloat(document.getElementById("sideAout2").innerHTML);
+        var asidec2 = parseFloat(document.getElementById("sideCout2").innerHTML);
+        var aangleb2 = parseFloat(document.getElementById("angleBout2").innerHTML);
+        var aanglec2 = parseFloat(document.getElementById("angleCout2").innerHTML);
+        var bsideb2 = parseFloat(document.getElementById("sideBout_b2").innerHTML);
+        var bsidec2 = parseFloat(document.getElementById("sideCout_b2").innerHTML);
+        var banglea2 = parseFloat(document.getElementById("angleAout_b2").innerHTML);
+        
+        var t1 = new Path2D();
+        t1.moveTo(startx, starty);
+        x1 = startx + asidea;
+        y1 = starty;
+        t1.lineTo(x1, y1);
+        x2 = x1 - asidec * Math.cos(degToRad(aangleb));
+        y2 = y1 - asidec * Math.sin(degToRad(aangleb));
+        t1.lineTo(x2, y2);
+        t1.closePath();
+        
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#0080ff';
+        ctx.fillStyle = '#1191ff';
+        ctx.setLineDash([0]);
+        ctx.stroke(t1);
+        
+        var t2 = new Path2D();
+        startx = anchorx + sided;
+        t2.moveTo(startx, starty);
+        if (sided == 0){
+            var theta = angled + aanglec;  // for determining x1, y2
+            var theta2 = angled + aanglec + banglea; // x2, y2
+            var quad = Math.floor(theta/90);
+            var quad2 = Math.floor(theta2/90);
+            // alert('theta: '+theta+' theta2: '+theta2+' quad: '+quad+' quad2: '+quad2);
+            calcPointToPoint(false, false);
+        }
+        else if (sidee == 0){
+            var theta = anglee + aangleb + banglea;
+            var theta2 = anglee + aangleb;
+            var quad = Math.floor(theta/90);
+            var quad2 = Math.floor(theta2/90);
+            // quad = assignFlippedQuad(theta);
+            // quad2 = assignFlippedQuad(theta2);
+            calcPointToPoint(true, false);
+        }
+        else{
+            x1 = startx - bsideb * Math.cos(degToRad(angled));
+            y1 = starty + bsideb * Math.sin(degToRad(angled));
+            x2 = startx + bsidec * Math.cos(degToRad(anglee));
+            y2 = starty + bsidec * Math.sin(degToRad(anglee));
+        }
+        t2.lineTo(x1, y1);
+        t2.moveTo(startx, starty);
+        t2.lineTo(x2, y2);
+        t2.moveTo(x1, y1);
+        t2.lineTo(x2, y2);
+       
+        ctx.setLineDash([0]);
+        ctx.strokeStyle = '#ff0000';
+        ctx.stroke(t2);
+        
+        var t1_b = new Path2D();
+        startx = anchorx;
+        t1_b.moveTo(startx, starty);
+        x1 = startx + asidea2;
+        y1 = starty;
+        t1_b.lineTo(x1, y1);
+        x2 = x1 - asidec2 * Math.cos(degToRad(aangleb2));
+        y2 = y1 - asidec2 * Math.sin(degToRad(aangleb2));
+        t1_b.lineTo(x2, y2);
+        t1_b.closePath();
+        
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#0080ff';
+        ctx.fillStyle = '#1191ff';
+        ctx.setLineDash([5, 2]);
+        ctx.stroke(t1_b);
+        
+        var t2_b = new Path2D();
+        startx = anchorx + sided;
+        t2_b.moveTo(startx, starty);
+        if (sided == 0){
+            var theta = angled + aanglec2;  // for determining x1, y2
+            var theta2 = angled + aanglec2 + banglea2; // x2, y2
+            var quad = Math.floor(theta/90);
+            var quad2 = Math.floor(theta2/90);
+            // alert('theta: '+theta+' theta2: '+theta2+' quad: '+quad+' quad2: '+quad2);
+            calcPointToPoint(false, true);
+        }
+        else if (sidee == 0){
+            var theta = anglee + aangleb2 + banglea2;
+            var theta2 = anglee + aangleb2;
+            var quad = Math.floor(theta/90);
+            var quad2 = Math.floor(theta2/90);
+            // quad = assignFlippedQuad(theta);
+            // quad2 = assignFlippedQuad(theta2);
+            calcPointToPoint(true, true);
+        }
+        else{
+            x1 = startx - bsideb2 * Math.cos(degToRad(angled));
+            y1 = starty + bsideb2 * Math.sin(degToRad(angled));
+            x2 = startx + bsidec2 * Math.cos(degToRad(anglee));
+            y2 = starty + bsidec2 * Math.sin(degToRad(anglee));
+        }
+        t2_b.lineTo(x1, y1);
+        t2_b.moveTo(startx, starty);
+        t2_b.lineTo(x2, y2);
+        t2_b.moveTo(x1, y1);
+        t2_b.lineTo(x2, y2);
+       
+        ctx.setLineDash([5, 2]);
+        ctx.strokeStyle = '#ff0000';
+        ctx.stroke(t2_b);
+        
+        function calcPointToPoint(flipped, alt){
+        // flipped = true if sidee = 0 (right hinge)
+        // alt = true if solution 2
+            var bsidebtmp = bsideb;
+            var bsidectmp = bsidec;
+            if (alt){
+                bsideb = bsideb2;
+                bsidec = bsidec2;
+            }
+            switch(quad){ // 0 is top right, going counterclockwise
+                case 0:
+                    if (flipped){
+                        x1 = startx - bsideb * Math.sin(degToRad(90 - theta));
+                    }
+                    else
+                        x1 = startx + bsideb * Math.sin(degToRad(90 - theta));
+                    y1 = starty - bsideb * Math.cos(degToRad(90 - theta));
+                    break;
+                case 1:
+                    if (flipped){
+                        x1 = startx + bsideb * Math.cos(degToRad(180 - theta));
+                    }
+                    else
+                        x1 = startx - bsideb * Math.cos(degToRad(180 - theta));
+                    y1 = starty - bsideb * Math.sin(degToRad(180 - theta));
+                    break;
+                case 2:
+                    if (flipped){
+                        x1 = startx + bsideb * Math.sin(degToRad(270 - theta));
+                    }
+                    else
+                        x1 = startx - bsideb * Math.sin(degToRad(270 - theta));
+                    y1 = starty + bsideb * Math.cos(degToRad(270 - theta));
+                    break;
+                case 3:
+                    if (flipped){
+                        x1 = startx - bsideb * Math.cos(degToRad(360 - theta));
+                    }
+                    else
+                        x1 = startx + bsideb * Math.cos(degToRad(360 - theta));
+                    y1 = starty + bsideb * Math.sin(degToRad(360 - theta));
+                    break;
+            }
+            switch(quad2){
+                case 0:
+                    if (flipped){
+                        x2 = startx - bsidec * Math.sin(degToRad(90 - theta2));
+                    }
+                    else
+                        x2 = startx + bsidec * Math.sin(degToRad(90 - theta2));
+                    y2 = starty - bsidec * Math.cos(degToRad(90 - theta2));
+                    break;
+                case 1:
+                    if (flipped){
+                        x2 = startx + bsidec * Math.cos(degToRad(180 - theta2));
+                    }
+                    else
+                        x2 = startx - bsidec * Math.cos(degToRad(180 - theta2));
+                    y2 = starty - bsidec * Math.sin(degToRad(180 - theta2));
+                    break;
+                case 2:
+                    if (flipped){
+                        x2 = startx + bsidec * Math.sin(degToRad(270 - theta2));
+                    }
+                    else
+                        x2 = startx - bsidec * Math.sin(degToRad(270 - theta2));
+                    y2 = starty + bsidec * Math.cos(degToRad(270 - theta2));
+                    break;
+                case 3:
+                    if (flipped){
+                        x2 = startx - bsidec * Math.cos(degToRad(360 - theta2));
+                    }
+                    x2 = startx + bsidec * Math.cos(degToRad(360 - theta2));
+                    y2 = starty + bsidec * Math.sin(degToRad(360 - theta2));
+                    break;
+            }
+            bsideb = bsidebtmp;
+            bsidec = bsidectmp;
+        }
+      }
+    }
+    
+    // Solves intersection based on one side and one angle provided
+    function solveint(){
+        setElementText("status_c", "All green!");
+        try{
+            // If triangle A and B do not have areas, then they are not solved
+            var doneA = document.getElementById("areaout").innerHTML;
+            var doneB = document.getElementById("areaout_b").innerHTML;
+            if (doneA == "" || doneB == ""){
+                throw "Triangles not solved yet";
+            }
+            var sideD = document.getElementById("sideDin");
+            var sideE = document.getElementById("sideEin");
+            var angleD = document.getElementById("angleDin");
+            var angleE = document.getElementById("angleEin");
+            var triAsideA = parseFloat(document.getElementById("sideAout").innerHTML);
+            var triAangleB = parseFloat(document.getElementById("angleBout").innerHTML);
+            var triAangleC = parseFloat(document.getElementById("angleCout").innerHTML);
+            var triBangleA = parseFloat(document.getElementById("angleAout_b").innerHTML);
+            
+            // outputs
+            var sided;
+            var sidee;
+            var angled;
+            var anglee;
+            
+            // only one side and angle need to be specified
+            if (sideD.value != ""){
+                // sideD is specified; calculate sideE
+                sided = sideD.value;
+                sideE.readOnly = true;
+                var sidesub = triAsideA - getInputNumber("sideDin");
+                if (sidesub < 0)
+                    throw "Side must be <= " + triAsideA;
+                if (sidesub == 0)
+                    sidee = 0;
+                setElementText("sideEout", sidesub, "");
+                setElementText("sideDout", sideD.value, "");
+            }
+            else if (sideE.value != ""){
+                // sideE is specified; calculate sideD
+                sideD.readOnly = true;
+                sidee = sideE.value;
+                var sidesub = triAsideA - getInputNumber("sideEin");
+                if (sidesub < 0)
+                    throw "Side must be <= " + triAsideA;
+                if (sidesub == 0)
+                    sided = 0;
+                setElementText("sideDout", sidesub, "");
+                setElementText("sideEout", sideE.value, "");
+            }
+            else{  // both sideD and sideE are empty
+                sideE.readOnly = false;
+                sideD.readOnly = false;
+                setElementText("sideDout", "", "");
+                setElementText("sideEout", "", "");
+                throw "A side length must be specified";
+            }
+            
+            /* if (d == 0): D + E + A2 + C1 = 360
+               else if (e == 0): D + E + A2 + B1 = 360
+               else: D + E + A2 = 180
+            */
+            if (angleD.value != ""){
+                // angleD is specified; calculate angleE
+                angleE.readOnly = true;
+                var anglesub;
+                if (sided == 0){
+                    // point-to-point left
+                    anglesub = 360 - triBangleA - triAangleC - getInputNumber("angleDin");
+                    if (anglesub <= 0){
+                        throw "Angle must be < " + (360 - triBangleA - triAangleC);
+                    }
+                }
+                else if (sidee == 0){
+                    // point-to-point right
+                    anglesub = 360 - triBangleA - triAangleB - getInputNumber("angleDin");
+                    if (anglesub <= 0){
+                        throw "Angle must be < " + (360 - triBangleA - triAangleB);
+                    }
+                }
+                else{
+                    anglesub = 180 - triBangleA - getInputNumber("angleDin");
+                    if (anglesub <= 0){
+                        throw "Angle must be < " + (180 - triBangleA);
+                    }
+                    setElementText("angleEout", anglesub, "");
+                }
+                setElementText("angleEout", anglesub, "");
+                setElementText("angleDout", angleD.value, "");
+            }
+            else if (angleE.value != ""){
+                // angleE is specified; calculate angleD
+                angleD.readOnly = true;
+                var anglesub;
+                if (sided == 0){
+                    // point-to-point left
+                    anglesub = 360 - triBangleA - triAangleC - getInputNumber("angleEin");
+                    if (anglesub <= 0){
+                        throw "Angle must be < " + (360 - triBangleA - triAangleC);
+                    }
+                }
+                else if (sidee == 0){
+                    // point-to-point right
+                    anglesub = 360 - triBangleA - triAangleB - getInputNumber("angleEin");
+                    if (anglesub <= 0){
+                        throw "Angle must be < " + (360 - triBangleA - triAangleB);
+                    }
+                }
+                else{
+                    anglesub = 180 - triBangleA - getInputNumber("angleEin");
+                    if (anglesub <= 0){
+                        throw "Angle must be < " + (180 - triBangleA);
+                    }
+                    setElementText("angleDout", anglesub, "");
+                }
+                setElementText("angleDout", anglesub, "");
+                setElementText("angleEout", angleE.value, "");
+            }
+            else {  // both angles are empty
+                angleD.readOnly = false;
+                angleE.readOnly = false;
+                setElementText("angleDout", "", "");
+                setElementText("angleEout", "", "");
+                throw "An angle must be specified";
+            }
+            draw();
+        }
+        catch(e){
+            clearOutputs(3);
+            setElementText("status_c", e);
+        }
+        
+    }
+      
+    // Adapted from Nayuki's triangle solver
+    // https://www.nayuki.io/page/triangle-solver-javascript
+    // The main function, which handles the HTML input/output for solving a triangle.
+            function solve(triangle) {
+                function doOutput(nodeId, val, suffix) {
+                    if (and(typeof val == "object", val.length == 2)) {  // Array
+                        setElementText(nodeId, formatNumber(val[0]) + suffix);
+                        setElementText(nodeId + "2", formatNumber(val[1]) + suffix);
+                        twosoln = true;
+                    } else if (typeof val == "number") {
+                        setElementText(nodeId, formatNumber(val) + suffix);
+                        setElementText(nodeId + "2", formatNumber(val) + suffix);
+                    } else
+                        throw "Assertion error";
+                }
+                
+                try {
+                    // Get input and solve
+                    if (triangle == 1){
+                        var a = getInputNumber("sideAin");
+                        var b = getInputNumber("sideBin");
+                        var c = getInputNumber("sideCin");
+                        var A = getInputNumber("angleAin");
+                        var B = getInputNumber("angleBin");
+                        var C = getInputNumber("angleCin");
+                        var answer = solveTriangle(a, b, c, A, B, C);
+                        solution = answer.slice(0, 6);  // Global variable for mouse hover
+
+                        // Set outputs
+                        setElementText("status", answer[7]);
+                        var twosoln = false;  // Is set to true by doOutput() if any answer item is a length-2 array
+                        doOutput("sideAout" , answer[0], "");
+                        doOutput("sideBout" , answer[1], "");
+                        doOutput("sideCout" , answer[2], "");
+                        doOutput("angleAout", answer[3], "");
+                        doOutput("angleBout", answer[4], "");
+                        doOutput("angleCout", answer[5], "");
+                        doOutput("areaout"  , answer[6], "");
+                        if (twosoln){
+                            document.getElementById("formtable").classList.remove("onesoln");
+                            document.getElementById("intfirst").style.display = 'block';
+                        }
+                        else
+                            document.getElementById("formtable").classList.add("onesoln");
+                    }
+                    else if (triangle == 2){
+                        var a = getInputNumber("sideAin_b");
+                        var b = getInputNumber("sideBin_b");
+                        var c = getInputNumber("sideCin_b");
+                        var A = getInputNumber("angleAin_b");
+                        var B = getInputNumber("angleBin_b");
+                        var C = getInputNumber("angleCin_b");
+                        var answer = solveTriangle(a, b, c, A, B, C);
+                        solution = answer.slice(0, 6);  // Global variable for mouse hover
+
+                        // Set outputs
+                        setElementText("status_b", answer[7]);
+                        var twosoln = false;  // Is set to true by doOutput() if any answer item is a length-2 array
+                        doOutput("sideAout_b" , answer[0], "");
+                        doOutput("sideBout_b" , answer[1], "");
+                        doOutput("sideCout_b" , answer[2], "");
+                        doOutput("angleAout_b", answer[3], "");
+                        doOutput("angleBout_b", answer[4], "");
+                        doOutput("angleCout_b", answer[5], "");
+                        doOutput("areaout_b"  , answer[6], "");
+                        if (twosoln){
+                            document.getElementById("formtable_b").classList.remove("onesoln");
+                            document.getElementById("intfirst").style.display = 'block';
+                        }
+                        else
+                            document.getElementById("formtable_b").classList.add("onesoln");
+                    }
+                } catch (e) {
+                    clearOutputs(triangle);
+                    if (triangle==1)
+                        setElementText("status", e);
+                    else
+                        setElementText("status_b", e);
+                }
+                solveint();
+            }
+            
+            
+            /*---- Solver functions ----*/
+            
+            // Given some sides and angles, this returns a tuple of 8 number/string values.
+            function solveTriangle(a, b, c, A, B, C) {
+                var sides  = (a != null) + (b != null) + (c != null);  // Boolean to integer conversion
+                var angles = (A != null) + (B != null) + (C != null);  // Boolean to integer conversion
+                var area, status;
+                
+                if (sides + angles != 3)
+                    throw "Give exactly 3 pieces of information";
+                else if (sides == 0)
+                    throw "Give at least one side length";
+                else if (sides == 3) {
+                    status = "Side side side (SSS) case";
+                    if (c >= a + b || a >= b + c || b >= c + a)
+                        throw status + " - No solution";
+                    A = solveAngle(b, c, a);
+                    B = solveAngle(c, a, b);
+                    C = solveAngle(a, b, c);
+                    // Heron's formula
+                    var s = (a + b + c) / 2;
+                    area = Math.sqrt(s * (s - a) * (s - b) * (s - c));
+                    
+                } else if (angles == 2) {
+                    status = "Angle side angle (ASA) case";
+                    // Find missing angle
+                    if (A == null) A = 180 - B - C;
+                    if (B == null) B = 180 - C - A;
+                    if (C == null) C = 180 - A - B;
+                    if (0 >= A || 0 >= B || 0 >= C)
+                        throw status + " - No solution";
+                    var sinA = Math.sin(degToRad(A));
+                    var sinB = Math.sin(degToRad(B));
+                    var sinC = Math.sin(degToRad(C));
+                    // Use law of sines to find sides
+                    var ratio;  // side / sin(angle)
+                    if (a != null) { ratio = a / sinA; area = a * ratio * sinB * sinC / 2; }
+                    if (b != null) { ratio = b / sinB; area = b * ratio * sinC * sinA / 2; }
+                    if (c != null) { ratio = c / sinC; area = c * ratio * sinA * sinB / 2; }
+                    if (a == null) a = ratio * sinA;
+                    if (b == null) b = ratio * sinB;
+                    if (c == null) c = ratio * sinC;
+                    
+                } else if (and(A != null, a == null) || and(B != null, b == null) || and(C != null, c == null)) {
+                    status = "Side angle side (SAS) case";
+                    if (and(A != null, A >= 180) || and(B != null, B >= 180) || and(C != null, C >= 180))
+                        throw status + " - No solution";
+                    if (a == null) a = solveSide(b, c, A);
+                    if (b == null) b = solveSide(c, a, B);
+                    if (c == null) c = solveSide(a, b, C);
+                    if (A == null) A = solveAngle(b, c, a);
+                    if (B == null) B = solveAngle(c, a, b);
+                    if (C == null) C = solveAngle(a, b, c);
+                    if (A != null) area = b * c * Math.sin(degToRad(A)) / 2;
+                    if (B != null) area = c * a * Math.sin(degToRad(B)) / 2;
+                    if (C != null) area = a * b * Math.sin(degToRad(C)) / 2;
+                    
+                } else {
+                    status = "Side side angle (SSA) case - ";
+                    var knownSide, knownAngle, partialSide;
+                    if (and(a != null, A != null)) { knownSide = a; knownAngle = A; }
+                    if (and(b != null, B != null)) { knownSide = b; knownAngle = B; }
+                    if (and(c != null, C != null)) { knownSide = c; knownAngle = C; }
+                    if (and(a != null, A == null)) partialSide = a;
+                    if (and(b != null, B == null)) partialSide = b;
+                    if (and(c != null, C == null)) partialSide = c;
+                    if (knownAngle >= 180)
+                        throw status + "No solution";
+                    var ratio = knownSide / Math.sin(degToRad(knownAngle));
+                    var temp = partialSide / ratio;  // sin(partialAngle)
+                    var partialAngle, unknownSide, unknownAngle;
+                    if (temp > 1 || and(knownAngle >= 90, partialSide >= knownSide))
+                        throw status + "No solution";
+                    else if (temp == 1 || knownSide >= partialSide) {
+                        status += "Unique solution";
+                        partialAngle = radToDeg(Math.asin(temp));
+                        unknownAngle = 180 - knownAngle - partialAngle;
+                        unknownSide = ratio * Math.sin(degToRad(unknownAngle));  // Law of sines
+                        area = knownSide * partialSide * Math.sin(degToRad(unknownAngle)) / 2;
+                    } else {
+                        status += "Two solutions";
+                        var partialAngle0 = radToDeg(Math.asin(temp));
+                        var partialAngle1 = 180 - partialAngle0;
+                        var unknownAngle0 = 180 - knownAngle - partialAngle0;
+                        var unknownAngle1 = 180 - knownAngle - partialAngle1;
+                        var unknownSide0 = ratio * Math.sin(degToRad(unknownAngle0));  // Law of sines
+                        var unknownSide1 = ratio * Math.sin(degToRad(unknownAngle1));  // Law of sines
+                        partialAngle = [partialAngle0, partialAngle1];
+                        unknownAngle = [unknownAngle0, unknownAngle1];
+                        unknownSide = [unknownSide0, unknownSide1];
+                        area = [knownSide * partialSide * Math.sin(degToRad(unknownAngle0)) / 2,
+                                knownSide * partialSide * Math.sin(degToRad(unknownAngle1)) / 2];
+                    }
+                    if (and(a != null, A == null)) A = partialAngle;
+                    if (and(b != null, B == null)) B = partialAngle;
+                    if (and(c != null, C == null)) C = partialAngle;
+                    if (and(a == null, A == null)) { a = unknownSide; A = unknownAngle; }
+                    if (and(b == null, B == null)) { b = unknownSide; B = unknownAngle; }
+                    if (and(c == null, C == null)) { c = unknownSide; C = unknownAngle; }
+                }
+                
+                return [a, b, c, A, B, C, area, status];
+            }
+            
+            
+            // Returns side c using law of cosines.
+            function solveSide(a, b, C) {
+                C = degToRad(C);
+                if (C > 0.001)
+                    return Math.sqrt(a * a + b * b - 2 * a * b * Math.cos(C));
+                else  // Explained in https://www.nayuki.io/page/numerically-stable-law-of-cosines
+                    return Math.sqrt((a - b) * (a - b) + a * b * C * C * (1 - C * C / 12));
+            }
+            
+            
+            // Returns angle C using law of cosines.
+            function solveAngle(a, b, c) {
+                var temp = (a * a + b * b - c * c) / (2 * a * b);
+                if (and(temp >= -1, 0.9999999 >= temp))
+                    return radToDeg(Math.acos(temp));
+                else if (1 >= temp)  // Explained in https://www.nayuki.io/page/numerically-stable-law-of-cosines
+                    return radToDeg(Math.sqrt((c * c - (a - b) * (a - b)) / (a * b)));
+                else
+                    throw "No solution";
+            }
+            
+            
+            /*---- Input/output/GUI handling ----*/
+            
+            // Either null, or an array of 6 items: [sideA, sideB, sideC, angleA, angleB, angleC].
+            // Each item is either a number or an array of 2 numbers.
+            var solution = null;
+            
+            
+            // Parses the number from the HTML form field with the given ID.
+            // Returns the number if it's positive and finite. Throws an exception if it's zero, negative, infinite, or NaN.
+            // Returns null if the field is blank.
+            function getInputNumber(elemId) {
+                var str = document.getElementById(elemId).value;
+                if (str == "")
+                    return null;
+                var result = parseFloat(str);
+                if (!isFinite(result))
+                    throw "Invalid number";
+                if (elemId != "sideDin" && elemId != "sideEin"){
+                    if (0 >= result)
+                        throw "All inputs must be positive";
+                }
+                else if (0 > result)
+                        throw "Side lengths cannot be negative";
+                return result;
+            }
+            
+            function clearOutputs(triangle) {
+                // e.g. sideA is associated with sideAin, sideAout, and sideAout2. But area does not have an input.
+                if (triangle == 1){
+                    var ioNames = ["sideA", "sideB", "sideC", "angleA", "angleB", "angleC", "area"];
+                    document.getElementById("formtable").classList.add("onesoln");
+                }
+                else if (triangle == 2){
+                    var ioNames = ["sideA", "sideB", "sideC", "angleA", "angleB", "angleC", "area"];
+                    document.getElementById("formtable_b").classList.add("onesoln");
+                }
+                else{
+                    var ioNames = ["sideD", "sideE", "angleD", "angleE"];
+                    document.getElementById("formtable_c").classList.add("onesoln");
+                }
+                solution = null;
+                
+                ioNames.forEach(function(name) {
+                    switch(triangle){
+                        case 1:
+                            setElementText(name + "out" , "");
+                            setElementText(name + "out2", "");
+                            break;
+                        case 2:
+                            setElementText(name + "out_b" , "");
+                            setElementText(name + "out_b2", "");
+                            break;
+                        case 3:
+                            document.getElementById(name+"in").readOnly = false;
+                            setElementText(name + "out" , "");
+                            break;
+                    }
+                });
+                if (triangle==1)
+                    setElementText("status", "");
+                else if (triangle==2)
+                    setElementText("status_b", "");
+                else{
+                    setElementText("status_c", "");
+                }
+            }
+            
+            /*---- Simple functions ----*/
+            
+            function setElementText(nodeId, str) {
+                var node = document.getElementById(nodeId);
+                while (node.firstChild != null)
+                    node.removeChild(node.firstChild);
+                node.appendChild(document.createTextNode(str));
+            }
+            
+            function parsePixels(str) {
+                var match = /^(\d+(?:\.\d*)?)px$/.exec(str);
+                if (match != null)
+                    return parseFloat(match[1]);
+                else
+                    throw "Invalid unit";
+            }
+            
+            function formatNumber(x) {
+                return x.toPrecision(9);
+            }
+            
+            function degToRad(x) {
+                return x / 180 * Math.PI;
+            }
+            
+            function radToDeg(x) {
+                return x / Math.PI * 180;
+            }
+            
+            // Workaround to avoid HTML parsing issues
+            function and(x, y) {
+                return x ? y : false;
+            }
+            
+            var DEGREE = "\u00B0";
+    
+    </script>
+    
+  </head>
+  <body onload="draw();">
+    <div id="backdiv">
+    <a href="http://45.55.27.207/projects/" id="backtowebsite" class="d-inline p-3 text-center text-white bg-primary">Back to Projects</a>
+    </div>
+<div class="jumbotron jumbotron-fluid text-center">
+    <h1 class="display-3">Triangle Solver</h1>
+    <p class="lead">Welcome to Aaron Liao's EECS 118 Term Project</p>
+    <hr class="my-4">
+    <p>Two triangles have one intersection. Change the parameters and see the results!</p>
+</div>
+
+
+<div class="container">
+<div class="row">
+    <div class="col-xs-8 col-sm-6 col-md-6 card card-block bg-faded">
+        <!-- <img class="img-responsive" src="http://puu.sh/ymfx7/634597fa45.jpg" alt="Placeholder"> -->
+    <canvas id="canvas" width="500" height="800"></canvas>
+
+    </div>
+    
+    <div class="col-xs-8 col-md-6">
+        <h3>Adjust Parameters</h3>
+        <hr>
+        <h4>Variable Guide <button id="collapseG" type="button" class="btn btn-info" data-toggle="collapse" data-target="#guide" onClick="toggleText(this.id);">Hide</button> <button id="loadex0" type="button" class="btn btn-info" onClick="loadExample(0);">Load Example 1</button> <button id="loadex1" type="button" class="btn btn-info" onClick="loadExample(1);">Load Example 2</button></h4>
+        <br>
+        <div id="guide" class="collapse show">
+        <img class="img-responsive col-md-8 col-xs-18" src="http://puu.sh/yxz8w/4260e2e77d.png" alt="">
+        </div>
+        <hr>
+        <p>Specify 3 inputs (including at least 1 side) for each triangle and 1 side + 1 angle for the intersection.</p>
+        <hr>
+        <h4 style="color:#0080ff">Triangle A <button id="collapseA" type="button" class="btn btn-info" data-toggle="collapse" data-target="#tri1table" onClick="toggleText(this.id);">Show</button></h4>
+        <div id="tri1table" class="collapse">
+        <form action="#" id="form_a" method="get" onsubmit="solve(1); return false">
+            <table class="noborder onesoln table table-striped table-hover" id="formtable" style="display:table; margin-left:auto; margin-right:auto">
+                <thead>
+                    <tr>
+                        <th>Variable</th>
+                        <th>Input</th>
+                        <th style="min-width:8em">Solution</th>
+                        <th style="min-width:8em"><span>Solution 2</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><label for="sideAin">Side <var>a</var> (units):</label></td>
+                        <td><input type="number" class="form-control" id="sideAin" autocomplete="off" min="0" step="any" style="width:8em" oninput="solve(1)"/></td>
+                        <td id="sideAout"></td>
+                        <td id="sideAout2"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="sideBin">Side <var>b</var> (units):</label></td>
+                        <td><input type="number" class="form-control" id="sideBin" autocomplete="off" min="0" step="any" style="width:8em" oninput="solve(1)"/></td>
+                        <td id="sideBout"></td>
+                        <td id="sideBout2"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="sideCin">Side <var>c</var> (units):</label></td>
+                        <td><input type="number" class="form-control" id="sideCin" autocomplete="off" min="0" step="any" style="width:8em" oninput="solve(1)"/></td>
+                        <td id="sideCout"></td>
+                        <td id="sideCout2"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="angleAin">Angle <var>A</var> (degrees):</label></td>
+                        <td><input type="number" class="form-control" id="angleAin" autocomplete="off" min="0" step="any" style="width:8em" oninput="solve(1)"/></td>
+                        <td id="angleAout"></td>
+                        <td id="angleAout2"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="angleBin">Angle <var>B</var> (degrees):</label></td>
+                        <td><input type="number" class="form-control" id="angleBin" autocomplete="off" min="0" step="any" style="width:8em" oninput="solve(1)"/></td>
+                        <td id="angleBout"></td>
+                        <td id="angleBout2"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="angleCin">Angle <var>C</var> (degrees):</label></td>
+                        <td><input type="number" class="form-control" id="angleCin" autocomplete="off" min="0" step="any" style="width:8em" oninput="solve(1)"/></td>
+                        <td id="angleCout"></td>
+                        <td id="angleCout2"></td>
+                    </tr>
+                    <tr>
+                        <td>Area (sq units):</td>
+                        <td></td>
+                        <td id="areaout"></td>
+                        <td id="areaout2"></td>
+                    </tr>
+                    <tr>
+                        <td>Status:</td>
+                        <td colspan="3" id="status"></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td colspan="3"><input value="Clear" class="btn btn-sm" type="reset" onclick="clearOutputs(1)"/></td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+        </div>
+        <hr>
+        <h4 style="color:#ff0000">Triangle B <button id="collapseB" type="button" class="btn btn-info" data-toggle="collapse" data-target="#tri2table" onClick="toggleText(this.id);">Show</button></h4>
+        <div id="tri2table" class="collapse">
+        <form action="#" id="form_b" method="get" onsubmit="solve(2); return false">
+            <table class="noborder onesoln table table-striped table-hover" id="formtable_b" style="display:table; margin-left:auto; margin-right:auto">
+                <thead>
+                    <tr>
+                        <th>Variable</th>
+                        <th>Input</th>
+                        <th style="min-width:8em">Solution</th>
+                        <th style="min-width:8em"><span>Solution 2</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><label for="sideAin_b">Side <var>a</var> (units):</label></td>
+                        <td><input type="number" class="form-control" id="sideAin_b" autocomplete="off" min="0" step="any" style="width:8em" oninput="solve(2)"/></td>
+                        <td id="sideAout_b"></td>
+                        <td id="sideAout_b2"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="sideBin_b">Side <var>b</var> (units):</label></td>
+                        <td><input type="number" class="form-control" id="sideBin_b" autocomplete="off" min="0" step="any" style="width:8em" oninput="solve(2)"/></td>
+                        <td id="sideBout_b"></td>
+                        <td id="sideBout_b2"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="sideCin_b">Side <var>c</var> (units):</label></td>
+                        <td><input type="number" class="form-control" id="sideCin_b" autocomplete="off" min="0" step="any" style="width:8em" oninput="solve(2)"/></td>
+                        <td id="sideCout_b"></td>
+                        <td id="sideCout_b2"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="angleAin_b">Angle <var>A</var> (degrees):</label></td>
+                        <td><input type="number" class="form-control" id="angleAin_b" autocomplete="off" min="0" step="any" style="width:8em" oninput="solve(2)"/></td>
+                        <td id="angleAout_b"></td>
+                        <td id="angleAout_b2"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="angleBin_b">Angle <var>B</var> (degrees):</label></td>
+                        <td><input type="number" class="form-control" id="angleBin_b" autocomplete="off" min="0" step="any" style="width:8em" oninput="solve(2)"/></td>
+                        <td id="angleBout_b"></td>
+                        <td id="angleBout_b2"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="angleCin_b">Angle <var>C</var> (degrees):</label></td>
+                        <td><input type="number" class="form-control" id="angleCin_b" autocomplete="off" min="0" step="any" style="width:8em" oninput="solve(2)"/></td>
+                        <td id="angleCout_b"></td>
+                        <td id="angleCout_b2"></td>
+                    </tr>
+                    <tr>
+                        <td>Area (sq units):</td>
+                        <td></td>
+                        <td id="areaout_b"></td>
+                        <td id="areaout_b2"></td>
+                    </tr>
+                    <tr>
+                        <td>Status:</td>
+                        <td colspan="3" id="status_b"></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td colspan="3"><input value="Clear" class="btn btn-sm" type="reset" onclick="clearOutputs(2)"/></td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+        </div>
+        <hr>
+        <h4 style="color:#00bb00">Intersect <button id="collapseC" type="button" class="btn btn-info" data-toggle="collapse" data-target="#inttable" onClick="toggleText(this.id);">Show</button></h4>
+        <div id="intfirst" style="display:none">Intersect parameters only apply to the first solution of each triangle</div>
+        <br>
+        <div id="inttable" class="collapse">
+        <form action="#" id="form_c" method="get" onsubmit="solveint(); return false">
+            <table class="noborder onesoln table table-striped table-hover" id="formtable_c" style="display:table; margin-left:auto; margin-right:auto">
+                <thead>
+                    <tr>
+                        <th>Variable</th>
+                        <th>Input</th>
+                        <th style="min-width:8em">Solution</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><label for="sideDin">Side <var>d</var> (units):</label></td>
+                        <td><input type="number" class="form-control" id="sideDin" autocomplete="off" min="0" step="any" style="width:8em" oninput="solveint()"/></td>
+                        <td id="sideDout"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="sideEin">Side <var>e</var> (units):</label></td>
+                        <td><input type="number" class="form-control" id="sideEin" autocomplete="off" min="0" step="any" style="width:8em" oninput="solveint()"/></td>
+                        <td id="sideEout"></td>
+                    </tr>
+                        <td><label for="angleDin">Angle <var>D</var> (degrees):</label></td>
+                        <td><input type="number" class="form-control" id="angleDin" autocomplete="off" min="0" step="any" style="width:8em" oninput="solveint()"/></td>
+                        <td id="angleDout"></td>
+                    </tr>
+                    </tr>
+                        <td><label for="angleEin">Angle <var>E</var> (degrees):</label></td>
+                        <td><input type="number" class="form-control" id="angleEin" autocomplete="off" min="0" step="any" style="width:8em" oninput="solveint()"/></td>
+                        <td id="angleEout"></td>
+                    </tr>
+                    <tr>
+                        <td>Status:</td>
+                        <td colspan="3" id="status_c"></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td colspan="3"><input value="Clear" class="btn btn-sm" type="reset" onclick="clearOutputs(3);"/></td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+        </div>
+    </div>
+</div>
+</div>
+
+</body>
+<hr>
+<footer class="bd-footer text-muted">
+  <div class="container">
+    <p>Developed using Bootstrap v4.0.0-beta.2 and <a href="nayuki.io/page/triangle-solver-javascript">Nayuki's Triangle Solver</a>. Bootstrap code licensed <a rel="license" href="https://github.com/twbs/bootstrap/blob/master/LICENSE" target="_blank">MIT</a>, docs <a rel="license" href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC BY 3.0</a>. Nayuki's Triangle Solver adapted strictly for personal use.</p>
+  </div>
+</footer>
+
+</html>
+
+
